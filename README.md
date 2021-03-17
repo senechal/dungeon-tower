@@ -1,3 +1,44 @@
+# Dungeon Tower
+
+You are a traveler from another world (Isekai) that arived in a small villagen on the middle of nowhere, together with you a tower appeared, a tower filled with dangerous monsters.
+You objective is to defeat the boss monster of the tower and save the village.
+
+
+Game Will have two dungeons, tower and florest, and the village (safe area);
+In the tower a linear path to the boss monster with 10 rooms will be generated at random every time you enter the dungeon.
+Each room will have a door to the correct path and up to two doors for random rooms.
+Every room will have monsters based on the room level and maybe a treasure chest.
+On the forest, will have wild animals, and plants to collect meat and ingredients.
+Every forest room will have a sign to go back to the village.
+The village will have a vendor where you can buy and sell items, a quest board, and other npcs to interact;
+
+
+Maps:
+    Village;
+    Tower Room type 1;
+    Tower Room type 2;
+    Tower Room type 3;
+    Boos Room;
+    Forest Room Type 1;
+    Forest Room Type 2;
+    Forest Room Type 3;
+
+NPCs:
+    Vendor,
+    villager 1;
+    villager 2;
+    villager 3;
+    Quest Board; (yes it will be a npc);
+
+Mobs:
+    Dungeon will have 5 levels of dificulty, and two monster per level.
+    Boss monster;
+    Boss minions;
+    Wild Boar;
+    Wild Rabbit;
+    Wild Chicken;
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
