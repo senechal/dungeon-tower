@@ -41,3 +41,14 @@ export const getTargetPosition = (direction, x, y, blockSize) => {
         [MOVEMENT_DIRECTIONS.up]: {x: x, y: y - blockSize },
     }[direction];
 };
+
+/**
+ * Description:
+ * Check if coordinates are the same as target.
+ * @param {ref} x       x coordinate reference value.
+ * @param {ref} t       y coordinate reference value.
+ * @param {ref} target  target reference coordinates values.
+ */
+export const isOnTarget = (x, y, target) => {
+    return target.current !== null && target.current.x === x.current && target.current.y === y.current;
+};

@@ -1,4 +1,6 @@
 import styled, { createGlobalStyle, keyframes } from 'styled-components/macro';
+import ttf from '@fonts/04B_03.ttf';
+import woff from '@fonts/04B_03.woff';
 
 const walk =  keyframes`
     from {
@@ -11,9 +13,15 @@ const walk =  keyframes`
 
 export const BaseStyles = createGlobalStyle`
     :root {
-        --pixel-size: 1px;
+        --pixel-size: 2px;
         --cell-size: ${({blockSize}) => blockSize ?? '16'};
         --grid-cell: calc( var(--pixel-size) * var(--cell-size));
+
+
+        --viewport-border: #6f78b2;
+        --viewport-bg-color: #d1d8ff;
+        --dialog-text-color: #535a83;
+        --dialog-button-hover-bg-color: #9fa7e4;
         --bg: #9fa7e4;
     }
     @media( min-width: 700px ) {
@@ -42,6 +50,12 @@ export const BaseStyles = createGlobalStyle`
         align-items: center;
         justify-content: center;
     }
+
+    @font-face{
+        font-family: '04B_03';
+        src: url(${woff}) format('woff'),
+             url(${ttf}) format('truetype');
+    }
 `;
 
 export const PixelArt = styled.div`
@@ -60,19 +74,21 @@ export const handleMovement = (isCharacter) => ({ coordinates={x: 0, y:0}, offse
     return {
         style:{
             transform: `translate3d(${x}px, ${y}px, 0)`,
-            zIndex: (isCharacter) ? y : undefined,
+            zIndex: (isCharacter) ? y || 1 : undefined,
         }
     }
 }
 
 export const Viewport = styled.div`
-    width: calc(var(--pixel-size) * ${({width}) => width ?? '160'});
-    height: calc(var(--pixel-size) * ${({height}) => height ?? '144'});
+    --viewport-width: calc(var(--pixel-size) * ${({width}) => width ?? '160'});
+    --viewport-height: calc(var(--pixel-size) * ${({height}) => height ?? '144'});
+    width: var(--viewport-width);
+    height: var(--viewport-height);
     overflow: hidden;
-    position:relative;
-    border: 4px solid #6f78b2;
+    position: relative;
+    border: 4px solid var(--viewport-border);
     border-radius: 4px;
-    background-color: #d1d8ff;
+    background-color: var(--viewport-bg-color);
 `;
 
 export const Character = styled(PixelArt).attrs(handleMovement(true))`
@@ -82,6 +98,7 @@ export const Character = styled(PixelArt).attrs(handleMovement(true))`
     height: calc( var(--grid-cell) * var(--char-size));
     position: absolute;
     overflow:hidden;
+    cursor: ${({hasAction}) => (hasAction ? 'pointer': null)};
 
     &[data-walking="true"]::after{
         animation: ${walk} 0.4s steps(4) infinite;

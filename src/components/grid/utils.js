@@ -6,7 +6,7 @@
  * @param {Number} blockSize   Size of a grid block.
  * @param {Number} pixelSize   Size of a pixel based on broser viewport size.
  */
- export const encodeCoordinates = (x, y, blockSize, pixelSize) => {
+ export const encodeCoordinates = ({x, y}, blockSize, pixelSize) => {
     const denominator = blockSize * pixelSize;
     return {
         x: Math.floor(x/denominator),
@@ -21,7 +21,7 @@
  * @param {Number} blockSize   Size of a grid block.
  * @param {Number} pixelSize   Size of a pixel based on broser viewport size.
  */
- export const decodeCoordinates = (x, y, blockSize, pixelSize) => {
+ export const decodeCoordinates = ({x, y}, blockSize, pixelSize) => {
     const denominator = blockSize * pixelSize;
     return {
         x: Math.floor(x*denominator),

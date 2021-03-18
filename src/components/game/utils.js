@@ -1,4 +1,10 @@
-import {Grid, AStarFinder} from 'pathfinding';
+import * as areas from './areas';
+import { Grid, AStarFinder} from 'pathfinding';
+
+
+export const getArea = (areaId) => {
+    return areas[areaId];
+}
 
 const getMovements = (path) => {
     const movements = [];

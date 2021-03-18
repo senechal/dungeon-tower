@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { encodeCoordinates } from './utils';
-import { Map } from './grid.styles';
+import { encodeCoordinates, decodeCoordinates } from './utils';
+import { Map, Indicator } from './grid.styles';
 
 const Grid = ({children, ...props}) => {
     const {
@@ -10,33 +10,46 @@ const Grid = ({children, ...props}) => {
         offset,
         grid,
         blockSize,
-        pixelSize,
+        moving,
         onBlockClick,
     } = props;
 
+    const [indicator, setIndicator] = useState({x: 0, y: 3});
+
+
     const handleClick = useCallback((event) => {
-        // Get Map Offset Values;
-        const [{left: mapOffsetX, top:mapOffsetY}] = event.target.getClientRects();
-        // Get Click coordinates;
-        const { clientX, clientY } = event;
+        if(event.target.dataset.map){
 
-        // Return Calculated coordinates inside the grid;
-        onBlockClick(encodeCoordinates(
-            clientX - mapOffsetX,
-            clientY - mapOffsetY,
+            // Get Map Offset Values;
+            const [{left: mapOffsetX, top:mapOffsetY}] = event.target.getClientRects();
+            // Get Click coordinates;
+            const { clientX, clientY } = event;
+
+        const x = clientX - mapOffsetX;
+        const y = clientY - mapOffsetY;
+        const gridCoordinates = encodeCoordinates(
+            {x, y},
             blockSize,
-            pixelSize
-        ))
+            window.pixelSize,
+            );
 
-    }, [blockSize, pixelSize, onBlockClick]);
+            setIndicator(gridCoordinates);
+            // Return Calculated coordinates inside the grid;
+            onBlockClick(gridCoordinates);
+        }
+
+    }, [blockSize, onBlockClick]);
 
     return (
         <Map
+            data-map
             {...grid}
             img={imageSrc}
             coordinates={coordinates}
             offset={offset}
             onClick={handleClick}>
+                { moving && <Indicator coordinates={decodeCoordinates(indicator, blockSize, window.pixelSize)} />}
+
             {children}
         </Map>
     )
@@ -46,7 +59,6 @@ const Grid = ({children, ...props}) => {
 Grid.propTypes = {
     imageSrc: PropTypes.string.isRequired,
     blockSize: PropTypes.number.isRequired,
-    pixelSize: PropTypes.number.isRequired,
     coordinates: PropTypes.shape({
         x: PropTypes.number,
         y: PropTypes.number,
@@ -59,6 +71,7 @@ Grid.propTypes = {
         x: PropTypes.number,
         y: PropTypes.number,
     }),
+    moving: PropTypes.bool,
     onBlockClick: PropTypes.func,
 };
 
@@ -67,6 +80,7 @@ Grid.defaultProps = {
     coordinates: {x: 0, y: 0},
     offset: {x: 0, y: 0},
     grid: {x: 0, y: 0},
+    moving: false,
     onBlockClick: Function.prototype,
 }
 

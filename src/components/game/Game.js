@@ -1,59 +1,42 @@
 import { useMemo } from 'react';
-import Grid, { encodeCoordinates, decodeCoordinates } from '../grid';
+import { useSelector } from 'react-redux'
+import { useMovementArray, usePixelSize } from '@hooks';
+import mainCharImg from '@images/c2.png'
+import Dialog from '../dialog';
+import Grid, { encodeCoordinates } from '../grid';
 import { BaseStyles, Viewport, Character } from './game.styles';
-import { useMovementArray } from '../../utils/hooks';
-import  { getPath, getObstacleMatrix } from './utils';
-import areaImage from '../../assets/img/map.png';
-import mainCharImg from '../../assets/img/c2.png'
-import c1 from '../../assets/img/c1.png';
-
-const blockSize = 16;
-const pixelSize = 5;
+import  { getArea, getPath, getObstacleMatrix } from './utils';
+import Npc from './npc';
 
 const Game = () => {
-    const viewport = {width: 176, height: 144};
+    usePixelSize();
+
+    const {
+        blockSize,
+        viewport,
+    } = useSelector(state => state.game);
+
     const viewportCharacterOffset = { x: 80, y: 64 };
+    const mainCharacter = {
+        imageSrc: mainCharImg,
+        size: 1,
+        offset: {x: 0, y: -6*window.pixelSize},
+        speed: 60,
+    }
+
+    const area = getArea('village');
+
     const {
         setMovements,
         character: movementCharacter,
         grid: movementGrid,
-    } = useMovementArray(pixelSize, blockSize, viewportCharacterOffset);
-
-
-    const mainCharacter = {
-        imageSrc: mainCharImg,
-        size: 1,
-        offset: {x: 0, y: -30},
-    }
-
-    const area = {
-        imageSrc: areaImage,
-        grid: { x: 13, y: 10},
-        walls: [
-            { pos: [0, 0], size: [13, 3]},
-            { pos: [2, 3], size: [1, 1]},
-            { pos: [3, 6], size: [1, 1]},
-            { pos: [11, 6], size: [1, 1]},
-        ],
-        characters: [
-            {
-                id: 1,
-                imageSrc: c1,
-                size: 1,
-                direction: 'down',
-                offset: {x: 0, y: -30},
-                x: 3,
-                y: 6,
-            },
-        ]
-    };
+    } = useMovementArray(mainCharacter.speed, blockSize, viewportCharacterOffset);
 
     const gridMatrix = useMemo(() => getObstacleMatrix(area.grid, area.walls), [area.grid, area.walls]);
 
-
     const handleTargetClick = (clickCoordinates) => {
         const {x, y} = movementCharacter.coordinates;
-        const charCoordinates = encodeCoordinates(x, y, blockSize, pixelSize);
+        const charCoordinates = encodeCoordinates({x, y}, blockSize, window.pixelSize);
         const path = getPath(charCoordinates, clickCoordinates, gridMatrix);
         setMovements(path);
     };
@@ -66,25 +49,16 @@ const Game = () => {
                 <Grid
                     onBlockClick={handleTargetClick}
                     coordinates={movementGrid.coordinates}
+                    moving={movementGrid.moving}
                     imageSrc={area.imageSrc}
                     grid={area.grid}
                     blockSize={blockSize}
-                    pixelSize={pixelSize}
                 >
                     {
-                        area.characters.map((char) => {
-                            const {id, imageSrc, size, offset, direction, x, y} = char;
-                            const coordinates = decodeCoordinates(x, y, blockSize, pixelSize);
-                            return (
-                                <Character
-                                    key={id}
-                                    coordinates={coordinates}
-                                    data-facing={direction}
-                                    offset={offset}
-                                    imageSrc={imageSrc}
-                                    size={size}
-                                />
-                            )
+                        area.npcs.map((npc) => {
+                            const {id} = npc;
+                            return  <Npc key={id} {...npc}/>
+
                         })
                     }
                     <Character
@@ -95,8 +69,8 @@ const Game = () => {
                         imageSrc={mainCharacter.imageSrc}
                         size={mainCharacter.size}
                     />
-
                 </Grid>
+                <Dialog />
             </Viewport>
         </>
     );
