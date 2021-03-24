@@ -1,35 +1,55 @@
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux'
-import { decodeCoordinates } from '@components/grid';
+import { encodeCoordinates } from '@components/grid';
+import { showDialog } from '@components/dialog/state/dialog.actions';
+import { useMovementArray, useInterval } from '@hooks';
 import { Character } from '../game.styles';
-import { showDialog } from '../../dialog/state/dialog.actions';
+import { getRandonPoint } from './utils';
 
 const NPC = (props) => {
     const {
         imageSrc,
         size,
         offset,
-        direction,
         position,
         name,
-        messages} = props;
-
+        messages,
+        randomMovement
+    } = props;
     const {
         blockSize,
-    } = useSelector(state => state.game);
+        show: displayingDialog,
+    } = useSelector(state => ({...state.game, ...state.dialog}));
     const dispatch = useDispatch();
+
+    const {
+        moveTo,
+        character: movementCharacter,
+    } = useMovementArray({
+        initialPosition: position,
+        speed: 60,
+        blockSize,
+    });
+
+    useInterval((run) => {
+        if(run && randomMovement && !displayingDialog){
+            const encoded = encodeCoordinates(movementCharacter.coordinates, blockSize, window.pixelSize)
+            const newPos = getRandonPoint(encoded, 1);
+            moveTo(newPos);
+        }
+    }, 2000);
 
     const handleClick = () => {
         dispatch(showDialog(name, messages));
     }
 
-    const coordinates = decodeCoordinates(position, blockSize, window.pixelSize);
     return (
         <Character
             onClick={Boolean(messages) ? handleClick : undefined}
             hasAction={Boolean(messages)}
-            coordinates={coordinates}
-            data-facing={direction}
+            coordinates={movementCharacter.coordinates}
+            data-facing={movementCharacter.facing}
+            data-walking={movementCharacter.walking}
             offset={offset}
             imageSrc={imageSrc}
             size={size}
@@ -52,6 +72,7 @@ NPC.propTypes = {
 
     messages: PropTypes.arrayOf(PropTypes.string),
     name: PropTypes.string,
+    randomMovement: PropTypes.bool,
 };
 
 NPC.defaultProsp = {
@@ -60,6 +81,7 @@ NPC.defaultProsp = {
     offset: {x: 0, y: 0},
     messages: null,
     name: '',
+    randomMovement: false,
 };
 
 

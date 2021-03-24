@@ -9,7 +9,6 @@ const config = {
     walls: [
         { pos: [0, 0], size: [13, 3]},
         { pos: [2, 3], size: [1, 1]},
-        { pos: [4, 4], size: [1,1]},
         { pos: [11, 6], size: [1, 1]},
         { pos: [0, 9], size: [13, 1]},
     ],

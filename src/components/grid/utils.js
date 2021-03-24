@@ -9,8 +9,8 @@
  export const encodeCoordinates = ({x, y}, blockSize, pixelSize) => {
     const denominator = blockSize * pixelSize;
     return {
-        x: Math.floor(x/denominator),
-        y: Math.floor(y/denominator),
+        x: Math.floor(x/denominator) || 0,
+        y: Math.floor(y/denominator) || 0,
     }
 }
 /**
@@ -27,7 +27,7 @@
         x: Math.floor(x*denominator),
         y: Math.floor(y*denominator),
     }
-}
+};
 
 
 export const isObstacle = (obstacleList, coordinates) => {
@@ -40,4 +40,19 @@ export const isObstacle = (obstacleList, coordinates) => {
 
         return x >= ox && x <= ox + (width - 1) && y >= oy && y <= oy + (height -1);
     });
-}
+};
+
+export const getObstacleMatrix = (grid, walls) => {
+    const matrix = Array(grid.y).fill(null).map(() => Array(grid.x).fill(0));
+    walls.forEach((wall) => {
+        const {pos, size} = wall;
+        const [x, y] = pos;
+        const [width, height] = size;
+        for(let i = x ; i < x + width; i++){
+            for(let j = y; j < y + height; j++){
+                matrix[j][i] = 1;
+            }
+        }
+    });
+    return matrix;
+};

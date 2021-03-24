@@ -4,7 +4,7 @@ import { Grid, AStarFinder} from 'pathfinding';
 
 export const getArea = (areaId) => {
     return areas[areaId];
-}
+};
 
 const getMovements = (path) => {
     const movements = [];
@@ -29,7 +29,7 @@ const getMovements = (path) => {
         lastPoint = point;
     });
     return movements;
-}
+};
 
 export const getPath = (start, end, matrix) => {
     const finderGrid = new Grid(matrix);
@@ -38,19 +38,4 @@ export const getPath = (start, end, matrix) => {
     });
     const finderPath = finder.findPath(start.x, start.y, end.x, end.y, finderGrid);
     return getMovements(finderPath);
-}
-
-export const getObstacleMatrix = (grid, walls) => {
-    const matrix = Array(grid.y).fill(null).map(() => Array(grid.x).fill(0));
-    walls.forEach((wall) => {
-        const {pos, size} = wall;
-        const [x, y] = pos;
-        const [width, height] = size;
-        for(let i = x ; i < x + width; i++){
-            for(let j = y; j < y + height; j++){
-                matrix[j][i] = 1;
-            }
-        }
-    });
-    return matrix;
-}
+};

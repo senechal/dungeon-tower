@@ -1,53 +1,41 @@
-import { useMemo } from 'react';
 import { useSelector } from 'react-redux'
-import { useMovementArray, usePixelSize } from '@hooks';
-import mainCharImg from '@images/c2.png'
+import { useMovementArray, usePixelSize, useMatrixArea} from '@hooks';
 import Dialog from '../dialog';
-import Grid, { encodeCoordinates } from '../grid';
+import Player from '../player';
+import Grid from '../grid';
 import { BaseStyles, Viewport, Character } from './game.styles';
-import  { getArea, getPath, getObstacleMatrix } from './utils';
 import Npc from './npc';
 
 const Game = () => {
     usePixelSize();
 
     const {
-        blockSize,
-        viewport,
-    } = useSelector(state => state.game);
+        game: {
+            blockSize,
+            viewport,
+            charOffset,
+        },
+        player,
+    } = useSelector(state => state);
 
-    const viewportCharacterOffset = { x: 80, y: 64 };
-    const mainCharacter = {
-        imageSrc: mainCharImg,
-        size: 1,
-        offset: {x: 0, y: -6*window.pixelSize},
-        speed: 60,
-    }
-
-    const area = getArea('village');
+    const area = useMatrixArea('village');
 
     const {
-        setMovements,
+        moveTo,
         character: movementCharacter,
         grid: movementGrid,
-    } = useMovementArray(mainCharacter.speed, blockSize, viewportCharacterOffset);
-
-    const gridMatrix = useMemo(() => getObstacleMatrix(area.grid, area.walls), [area.grid, area.walls]);
-
-    const handleTargetClick = (clickCoordinates) => {
-        const {x, y} = movementCharacter.coordinates;
-        const charCoordinates = encodeCoordinates({x, y}, blockSize, window.pixelSize);
-        const path = getPath(charCoordinates, clickCoordinates, gridMatrix);
-        setMovements(path);
-    };
-
+    } = useMovementArray({
+        speed: 60,
+        blockSize,
+        offset: charOffset,
+    });
 
     return (
         <>
             <BaseStyles blockSize={blockSize} />
             <Viewport {...viewport} >
                 <Grid
-                    onBlockClick={handleTargetClick}
+                    onBlockClick={moveTo}
                     coordinates={movementGrid.coordinates}
                     moving={movementGrid.moving}
                     imageSrc={area.imageSrc}
@@ -57,7 +45,7 @@ const Game = () => {
                     {
                         area.npcs.map((npc) => {
                             const {id} = npc;
-                            return  <Npc key={id} {...npc}/>
+                            return  <Npc key={id} {...npc} />
 
                         })
                     }
@@ -65,11 +53,12 @@ const Game = () => {
                         coordinates={movementCharacter.coordinates}
                         data-facing={movementCharacter.facing}
                         data-walking={movementCharacter.walking}
-                        offset={mainCharacter.offset}
-                        imageSrc={mainCharacter.imageSrc}
-                        size={mainCharacter.size}
+                        offset={player.appearance.offset}
+                        imageSrc={player.appearance.imageSrc}
+                        size={player.appearance.size}
                     />
                 </Grid>
+                <Player />
                 <Dialog />
             </Viewport>
         </>

@@ -1,19 +1,44 @@
 import styled, { createGlobalStyle, keyframes } from 'styled-components/macro';
-import ttf from '@fonts/04B_03.ttf';
-import woff from '@fonts/04B_03.woff';
+import shadow from '@images/shadow.png';
 
-const walk =  keyframes`
-    from {
-        transform: translate3d(0%,0%,0);
+const walk=  keyframes`
+    0% {
+        transform: translate3d(-33%,-2px,0);
     }
-    to {
-        transform: translate3d(-100%,0%,0);
+    25% {
+        transform: translate3d(-66%,-2px,0);
+    }
+    50% {
+        transform: translate3d(-33%,-2px,0);
+    }
+    75% {
+        transform: translate3d(-0%,-2px,0);
+    }
+    100% {
+        transform: translate3d(-33%,-2px,0);
+    }
+`;
+
+const walkShadow =  keyframes`
+    0% {
+        transform: translate3d(-33%,12px,0);
+    }
+    25% {
+        transform: translate3d(-66%,12px,0);
+    }
+    50% {
+        transform: translate3d(-33%,12px,0);
+    }
+    75% {
+        transform: translate3d(-0%,12px,0);
+    }
+    100% {
+        transform: translate3d(-33%,12px,0);
     }
 `;
 
 export const BaseStyles = createGlobalStyle`
     :root {
-        --pixel-size: 2px;
         --cell-size: ${({blockSize}) => blockSize ?? '16'};
         --grid-cell: calc( var(--pixel-size) * var(--cell-size));
 
@@ -23,21 +48,7 @@ export const BaseStyles = createGlobalStyle`
         --dialog-text-color: #535a83;
         --dialog-button-hover-bg-color: #9fa7e4;
         --bg: #9fa7e4;
-    }
-    @media( min-width: 700px ) {
-        :root {
-        --pixel-size: 3px;
-        }
-    }
-    @media( min-width: 1000px ) {
-        :root {
-        --pixel-size: 4px;
-        }
-    }
-    @media( min-width: 1000px ) {
-        :root {
-        --pixel-size: 5px;
-        }
+        font-family: '04b_03',Lato,LatoExtended,sans-serif;
     }
 
     html, body {
@@ -49,12 +60,6 @@ export const BaseStyles = createGlobalStyle`
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    @font-face{
-        font-family: '04B_03';
-        src: url(${woff}) format('woff'),
-             url(${ttf}) format('truetype');
     }
 `;
 
@@ -69,8 +74,8 @@ export const PixelArt = styled.div`
 `;
 
 export const handleMovement = (isCharacter) => ({ coordinates={x: 0, y:0}, offset={x: 0, y:0}}) => {
-    const x = coordinates.x + offset.x;
-    const y = coordinates.y + offset.y;
+    const x = coordinates.x + (offset.x * window.pixelSize);
+    const y = coordinates.y + (offset.y * window.pixelSize);
     return {
         style:{
             transform: `translate3d(${x}px, ${y}px, 0)`,
@@ -93,7 +98,8 @@ export const Viewport = styled.div`
 
 export const Character = styled(PixelArt).attrs(handleMovement(true))`
     --char-size: ${({size}) => size ?? '2'};
-    --tile-size: calc(var(--char-size) * 4);
+    --tile-width: calc(var(--char-size) * 3);
+    --tile-height: calc(var(--char-size) * 4);
     width: calc( var(--grid-cell) * var(--char-size));
     height: calc( var(--grid-cell) * var(--char-size));
     position: absolute;
@@ -101,35 +107,51 @@ export const Character = styled(PixelArt).attrs(handleMovement(true))`
     cursor: ${({hasAction}) => (hasAction ? 'pointer': null)};
 
     &[data-walking="true"]::after{
-        animation: ${walk} 0.4s steps(4) infinite;
+        animation: ${walk} 0.6s steps(1) infinite;
     }
-    &[data-facing="right"]::after {
-        background-position-y: calc( var(--pixel-size) * calc(var(--cell-size) * calc(var(--char-size) * -1)));
-    }
-    &[data-facing="up"]::after {
-        background-position-y: calc( var(--pixel-size) * calc(var(--cell-size) * calc(var(--char-size) * -2)) );
+    &[data-walking="true"]::before{
+        animation: ${walkShadow} 0.6s steps(1) infinite;
     }
     &[data-facing="left"]::after {
+        background-position-y: calc( var(--pixel-size) * calc(var(--cell-size) * calc(var(--char-size) * -1)));
+    }
+    &[data-facing="left"]::before {
+        background-position-y: calc( var(--pixel-size) * calc(var(--cell-size) * calc(var(--char-size) * -1)));
+    }
+    &[data-facing="right"]::after {
+        background-position-y: calc( var(--pixel-size) * calc(var(--cell-size) * calc(var(--char-size) * -2)) );
+    }
+    &[data-facing="right"]::before {
+        background-position-y: calc( var(--pixel-size) * calc(var(--cell-size) * calc(var(--char-size) * -2)) );
+    }
+    &[data-facing="up"]::after {
+        background-position-y: calc( var(--pixel-size) * calc(var(--cell-size) * calc(var(--char-size) * -3)) );
+    }
+    &[data-facing="up"]::before {
         background-position-y: calc( var(--pixel-size) * calc(var(--cell-size) * calc(var(--char-size) * -3)) );
     }
 
     &::before {
         content: "";
-        width: calc( var(--grid-cell) * var(--char-size));
-        height: calc( var(--grid-cell) * var(--char-size));
+        width: calc( var(--grid-cell) * var(--tile-width));
+        height: calc( var(--grid-cell) * var(--tile-height));
         position: absolute;
         left:0;
-        top:0;
-        background: url("https://assets.codepen.io/21542/DemoRpgCharacterShadow.png") no-repeat no-repeat;
+        top:-10px;
+        background: url(${shadow}) no-repeat no-repeat;
         background-size: 100%;
+        opacity: 0.8;
+        transform: translate3d(-33%,12px,0);
     }
     &::after {
         content: "";
         position: absolute;
         background: url("${({imageSrc}) => imageSrc}") no-repeat no-repeat;
         background-size: 100%;
-        width: calc( var(--grid-cell) * var(--tile-size) );
-        height: calc( var(--grid-cell) * var(--tile-size) );
+        width: calc( var(--grid-cell) * var(--tile-width) );
+        height: calc( var(--grid-cell) * var(--tile-height) );
+        transform: translate3d(-33%,-2px,0);
+
     }
 `;
 

@@ -16,25 +16,18 @@ const Grid = ({children, ...props}) => {
 
     const [indicator, setIndicator] = useState({x: 0, y: 3});
 
-
     const handleClick = useCallback((event) => {
         if(event.target.dataset.map){
-
-            // Get Map Offset Values;
             const [{left: mapOffsetX, top:mapOffsetY}] = event.target.getClientRects();
-            // Get Click coordinates;
             const { clientX, clientY } = event;
-
-        const x = clientX - mapOffsetX;
-        const y = clientY - mapOffsetY;
-        const gridCoordinates = encodeCoordinates(
-            {x, y},
-            blockSize,
-            window.pixelSize,
+            const x = clientX - mapOffsetX;
+            const y = clientY - mapOffsetY;
+            const gridCoordinates = encodeCoordinates(
+                {x, y},
+                blockSize,
+                window.pixelSize,
             );
-
             setIndicator(gridCoordinates);
-            // Return Calculated coordinates inside the grid;
             onBlockClick(gridCoordinates);
         }
 
@@ -47,9 +40,9 @@ const Grid = ({children, ...props}) => {
             img={imageSrc}
             coordinates={coordinates}
             offset={offset}
-            onClick={handleClick}>
-                { moving && <Indicator coordinates={decodeCoordinates(indicator, blockSize, window.pixelSize)} />}
-
+            onClick={handleClick}
+        >
+            { moving && <Indicator coordinates={decodeCoordinates(indicator, blockSize, window.pixelSize)} />}
             {children}
         </Map>
     )

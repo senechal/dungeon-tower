@@ -22,7 +22,7 @@ export const CharacterInfo = styled.span`
 `;
 
 
-export const Indicator = styled.span.attrs(handleMovement(true))`
+export const Indicator = styled.span.attrs(handleMovement())`
     width: var(--grid-cell);
     height: var(--grid-cell);
     position: absolute;
